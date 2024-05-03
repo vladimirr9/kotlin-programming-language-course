@@ -6,12 +6,9 @@ internal fun parseFixtures(fixturesText: List<String>): List<Fixture> {
     val lines = fixturesText.drop(1)
     val fixtureMap : MutableMap<Int, MutableList<Match>> = mutableMapOf()
     for (line in lines) {
-        val vals = line.split(",")
-        val round = vals[0].toInt()
-        val team1 = vals[2]
-        val resString = vals[3]
-        val team2 = vals[4]
-        val resSplit = resString.split("-")
+        val (roundStr, _, team1, resStr, team2) = line.split(",")
+        val round = roundStr.toInt()
+        val resSplit = resStr.split("-")
         val homeScoreInt = resSplit[0].toInt()
         val awayScoreInt = resSplit[1].toInt()
         val match = Match(Team(team1), Team(team2), homeScoreInt, awayScoreInt)

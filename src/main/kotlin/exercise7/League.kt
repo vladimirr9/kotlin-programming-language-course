@@ -134,7 +134,6 @@ internal interface LeagueApi {
  * and [teams] are all mentioned in the [fixtures] list.
  */
 
-// TODO Implement League class that implements LeagueApi interface.
 
 internal data class League(override val teams: List<Team>, val fixtures: List<Fixture>) : LeagueApi {
     override val leagueTable: List<LeagueTableEntry>
@@ -202,27 +201,35 @@ internal data class League(override val teams: List<Team>, val fixtures: List<Fi
 
             for (fixture in fixtures.subList(0, fixtureId)) {
                 for (match in fixture.matches) {
-                    if (team == match.homeTeam || team == match.awayTeam) {
-                        val (ourTeamScore, otherTeamScore) = if (team == match.homeTeam) Pair(
-                            match.homeTeamScore,
-                            match.awayTeamScore
-                        ) else Pair(match.awayTeamScore, match.homeTeamScore)
-                        totalGamesPlayed += 1
-                        totalScoredGoals += ourTeamScore
-                        totalConcededGoals += otherTeamScore
-                        val diff = ourTeamScore - otherTeamScore
-                        when {
-                            diff == 0 -> draws += 1
-                            diff > 0 -> wins += 1
-                            diff < 0 -> loses += 1
-                        }
-
+                    if (team !in setOf(match.homeTeam, match.awayTeam)) {
+                        continue
+                    }
+                    val (ourTeamScore, otherTeamScore) = if (team == match.homeTeam) Pair(
+                        match.homeTeamScore,
+                        match.awayTeamScore
+                    ) else Pair(match.awayTeamScore, match.homeTeamScore)
+                    totalGamesPlayed += 1
+                    totalScoredGoals += ourTeamScore
+                    totalConcededGoals += otherTeamScore
+                    val diff = ourTeamScore - otherTeamScore
+                    when {
+                        diff == 0 -> draws += 1
+                        diff > 0 -> wins += 1
+                        diff < 0 -> loses += 1
                     }
                 }
             }
-            val entry =
-                LeagueTableEntry(team, totalGamesPlayed, wins, loses, draws, totalScoredGoals, totalConcededGoals)
-            entries.add(entry)
+            entries.add(
+                LeagueTableEntry(
+                    team,
+                    totalGamesPlayed,
+                    wins,
+                    loses,
+                    draws,
+                    totalScoredGoals,
+                    totalConcededGoals
+                )
+            )
         }
         return entries.sortedByDescending { entry -> entry.totalPoints };
     }
